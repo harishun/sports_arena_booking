@@ -1,0 +1,103 @@
+<?php
+session_start();
+if($_SESSION['role'] != 'admin') {
+    header("Location: index.php");
+    exit;
+}
+else{
+    include("connect_db.php");
+    $sql = "SELECT * FROM `sports` ORDER BY `sport` ASC";
+    $result = mysqli_query($conn, $sql);
+}
+
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manage Sports</title>
+    <link rel="stylesheet" href="../../css/sports.css">
+</head>
+
+<body>
+    <!-- SPORTS (Add + Edit) -->
+    <div class="card" id="sports">
+        <h2>Sports<a href="admin_home.php" class="button back"><svg xmlns="http://www.w3.org/2000/svg"
+                    height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                    <path
+                        d="M280-200v-80h284q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l104 104-56 56-200-200 200-200 56 56-104 104h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H280Z" />
+                </svg></a></h2>
+        <!-- Existing sports (each with its own page/anchor for editing + arenas) -->
+        <table>
+            <thead>
+                <tr>
+                    <th>Sport</th>
+                    <th>Card Image</th>
+                    <th>Manage</th>
+                </tr>
+            </thead>
+            <form id="sportForm" action="edit_sports.php" method="post">
+            <tbody>
+                <?php
+                if (mysqli_num_rows($result) > 0) {
+                    while ($row = mysqli_fetch_assoc($result)) {
+                        echo "<tr>
+                                <td>" . htmlspecialchars($row['sport']) . "</td>
+                                <td><img class='mini' src='" . htmlspecialchars($row['file_name']) . "' alt='" . htmlspecialchars($row['sport']) . " card'></td>
+                                <td><a class='btn' onclick=submitSport('".$row["sport"]."')><svg xmlns='http://www.w3.org/2000/svg'
+                                            height='24px' viewBox='0 -960 960 960' width='24px' fill='#e3e3e3'>
+                                            <path
+                                    d=\"M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z\" />
+                                </svg>
+                                </a></td>
+                            </tr>";
+                        }
+                    }
+                    ?>
+                <tr>
+                    <td>Badminton</td>
+                    <td><img class="mini" src="../images/sport_cards/badminton.jpg" alt="Badminton card"></td>
+                    <td><a class="btn" onclick="submitSport('Badminton')"><svg xmlns="http://www.w3.org/2000/svg"
+                                height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                <path
+                                    d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
+                            </svg></a></td>
+                </tr>
+                <tr>
+                    <td>Basketball</td>
+                    <td><img class="mini" src="../../images/sport_cards/badminton.jpg" alt="Basketball card"></td>
+                    <td><a class="btn" onclick="submitSport('Basketball')"><svg xmlns="http://www.w3.org/2000/svg"
+                                height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                <path
+                                    d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
+                            </svg></a></td>
+                </tr>
+                <tr>
+                    <td>Tennis</td>
+                    <td><img class="mini" src="../../images/sport_cards/badminton.jpg" alt="Tennis card"></td>
+                    <td><a class="btn" onclick="submitSport('Badminton')"><svg xmlns="http://www.w3.org/2000/svg"
+                                height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                <path
+                                    d="M200-200h57l391-391-57-57-391 391v57Zm-80 80v-170l528-527q12-11 26.5-17t30.5-6q16 0 31 6t26 18l55 56q12 11 17.5 26t5.5 30q0 16-5.5 30.5T817-647L290-120H120Zm640-584-56-56 56 56Zm-141 85-28-29 57 57-29-28Z" />
+                            </svg></a></td>
+                </tr>
+                <tr>
+                    <td>Sports</td>
+                    <td>
+                        <div class="img_place_holder"></div>
+                    </td>
+                    <td><a class="btn" href="edit_sports.php"><svg xmlns="http://www.w3.org/2000/svg" height="24px"
+                                viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                                <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
+                            </svg></a></td>
+                </tr>
+            </tbody>
+            <input type="hidden" id="sportInput" name="sport">
+            </form>
+        </table>
+    </div>
+</body>
+<script src="../js/submit.js"></script>
+</html>

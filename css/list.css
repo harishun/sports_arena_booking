@@ -1,0 +1,102 @@
+:root {
+    --primary-accent-color: #26ff00;
+    --secondary-accent-color: #149e19d5;
+    --primary-text-color: white;
+    --ink: #e7f6ff;
+    --ink-dim: #bcd2df;
+    --glass-color: rgba(0, 0, 0, 0.5);
+    --element-idle-background: rgba(50, 50, 50, 0.6);
+    --card-w: 300px;
+    --card-gap: 20px;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    color: var(--ink);
+    user-select: none;
+}
+
+body {
+    font-family: Georgia, Cambria, "Times New Roman", serif;
+    color: var(--ink);
+    background-color: black;
+    background-image: url(../images/background/background_main.jpg);
+    background-size: cover;
+    background-attachment: fixed;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/*back button*/
+.back svg {
+    position: fixed;
+    top: 5%;
+    right: 2%;
+    height:auto;
+    width:70px; 
+    z-index:2000;
+    transform: scale(1);
+    transition: all 0.3s ease;
+}
+.back svg:hover {
+    position: fixed;
+    top: 5%;
+    right: 3%;
+    height:auto;
+    width:70px; 
+    z-index:2000;
+    fill: red;
+    transform: scale(1.1);
+}
+
+/*cards*/
+.card{
+    display: block;
+    width: 95%;
+    text-align:center;
+    min-width:900px;
+    background: var(--glass-color);
+    backdrop-filter: blur(10px);
+    border-radius: 15px;
+    box-shadow: var(--shadow);
+    margin-top:3%;
+    margin-inline:auto;
+}
+.card h2{
+    color: var(--primary-accent-color);
+    font-size:2rem;
+    padding-block:5%;
+}
+
+/*table*/
+table {
+    width: 95%;
+    margin: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--element-hover-background);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 10px 1px var(--primary-accent-color);
+}
+
+table th,
+table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--secondary-accent-color);
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+table thead th {
+    background:var(--element-idle-background);
+    backdrop-filter: blur(10px);
+    color: var(--ink-dim);
+}
+
+.table{
+    padding-bottom:20px;
+}

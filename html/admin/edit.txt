@@ -1,0 +1,66 @@
+<!-- SPORT: BADMINTON -->
+<div class="section" id="sport-badminton">
+    <h2>Badminton</h2>
+
+    <!-- Edit sport details + card image -->
+    <h3 class="sub">Edit Sport</h3>
+    <div class="two-col">
+        <div class="col">
+            <img class="img_preview" src="#img" alt="Badminton card image">
+        </div>
+        <div class="col">
+            <form class="form" action="#" method="post" enctype="multipart/form-data">
+                <label>Sport Name
+                    <input type="text" name="sport_name_edit" value="Badminton" required>
+                </label>
+                <label>Replace Card Image
+                    <input type="file" name="sport_card_image_edit" accept="image/*">
+                </label>
+                <label>Description
+                    <textarea name="sport_desc_edit"
+                        rows="3">Fast-paced racquet sport for singles and doubles.</textarea>
+                </label>
+                <div class="actions">
+                    <button class="button" type="submit">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Arenas under Badminton -->
+    <h3 class="sub">Badminton Arenas</h3>
+
+    <!-- Existing arena example #1 -->
+    <fieldset class="arena">
+        <legend>UOC Court A</legend>
+    </fieldset>
+
+    <!-- Existing arena example #2 -->
+    <fieldset class="arena">
+        <legend>UOC Court B</legend>
+    </fieldset>
+
+    <!-- Add another arena to Badminton -->
+    <h4 class="sub small">Add New Badminton Arena</h4>
+    <form class="form" action="#" method="post" enctype="multipart/form-data">
+        <label>Arena Name
+            <input type="text" name="new_arena_name" placeholder="e.g., UOC Court C" required>
+        </label>
+        <label>Location
+            <input type="text" name="new_arena_loc" placeholder="Building / Area">
+        </label>
+        <label>Arena Image
+            <input type="file" name="new_arena_img" accept="image/*">
+        </label>
+        <label>Active Hours
+            <input type="time" name="new_open"> —
+            <input type="time" name="new_close">
+        </label>
+        <label>Hourly Price
+            <input type="number" name="new_price" min="0" step="0.01">
+        </label>
+        <div class="actions">
+            <button class="button" type="submit">Add Arena</button>
+        </div>
+    </form>
+</div>
