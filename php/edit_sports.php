@@ -6,26 +6,73 @@ if ($_SESSION['role'] != 'admin') {
 }
 
 include("connect_db.php");
+
+// Default mode is 'add'
 $mode = "add";
 $sport = "Sport Name";
 $image = "";
 $description = "Short Description (Optional)";
+$sport_id = null;
+$arenas = [];
 
-if (isset($_POST["sport"])) {
+// Check if we are in 'edit' mode from URL (initial page load) or from a submitted form
+if (isset($_REQUEST["sport"]) || (isset($_POST['mode']) && $_POST['mode'] == 'edit')) {
     $mode = "edit";
-    $sport_name = $_POST["sport"];
-    $sql = "SELECT * FROM `sports` WHERE sport='$sport_name'";
+    // Use the sport name from the request or the form's original_sport_name
+    $sport_name = mysqli_real_escape_string($conn, $_REQUEST["sport"] ?? $_POST["original_sport_name"]);
+    
+    $sql = "SELECT * FROM `sports` WHERE sport='" . $sport_name . "'";
     $result = mysqli_query($conn, $sql);
-    $row = mysqli_fetch_assoc($result);
-    $sport = $row["sport"];
-    $image = $row["file_name"] ?? "";
-    $description = htmlspecialchars($row["description"] ?? "");
+    
+    if ($row = mysqli_fetch_assoc($result)) {
+        $sport_id = $row['id'];
+        $sport = $row["sport"];
+        $image = $row["file_name"] ?? "";
+        $description = htmlspecialchars($row["description"] ?? "");
+
+        // Fetch existing arenas for this sport
+        $sql_arenas = "SELECT * FROM `arenas` WHERE sport_id = $sport_id ORDER BY arena_name ASC";
+        $result_arenas = mysqli_query($conn, $sql_arenas);
+        while ($arena_row = mysqli_fetch_assoc($result_arenas)) {
+            $arenas[] = $arena_row;
+        }
+    }
 }
 
+
+// Handle adding a new arena
+if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_arena'])) {
+    $current_sport_name = mysqli_real_escape_string($conn, $_POST['sport_name']);
+    $sport_id_query = "SELECT id FROM sports WHERE sport='$current_sport_name' LIMIT 1";
+    $sport_id_result = mysqli_query($conn, $sport_id_query);
+    if ($sport_id_row = mysqli_fetch_assoc($sport_id_result)) {
+        $sport_id = $sport_id_row['id'];
+        $arena_name = mysqli_real_escape_string($conn, $_POST['new_arena_name']);
+        $location = mysqli_real_escape_string($conn, $_POST['new_arena_loc']);
+        $open_time = $_POST['new_open'];
+        $close_time = $_POST['new_close'];
+        $price = $_POST['new_price'];
+
+        $sql_insert_arena = "INSERT INTO arenas (sport_id, arena_name, location, open_time, close_time, hourly_price) VALUES ('$sport_id', '$arena_name', '$location', '$open_time', '$close_time', '$price')";
+
+        if (mysqli_query($conn, $sql_insert_arena)) {
+            // Redirect to refresh the page and show the new arena
+            header("Location: edit_sports.php?sport=" . urlencode($current_sport_name));
+            exit;
+        } else {
+            echo "Error adding arena: " . mysqli_error($conn);
+        }
+    }
+}
+
+
+// Handle saving sport details (Add or Edit)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_sport'])) {
+    // Determine the mode from the hidden form field
+    $current_mode = $_POST['mode'];
     $sport_name = mysqli_real_escape_string($conn, $_POST['sport_name']);
     $sport_desc = mysqli_real_escape_string($conn, $_POST['sport_desc']);
-    $targetFile = $image;
+    $targetFile = $_POST['original_image']; // Keep original image by default
 
     if (isset($_FILES["sports_card_image"]) && $_FILES["sports_card_image"]["error"] == UPLOAD_ERR_OK) {
         $uploadDir = "../images/sport_cards/";
@@ -38,37 +85,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_sport'])) {
         move_uploaded_file($_FILES["sports_card_image"]["tmp_name"], $targetFile);
     }
 
-    if ($mode == 'add') {
+    if ($current_mode == 'add') {
         $sql = "INSERT INTO sports (sport, description, file_name) VALUES ('$sport_name', '$sport_desc', '$targetFile')";
-    } else {
-        $original_sport_name = $_POST["original_sport_name"];
+    } else { // It's 'edit' mode
+        $original_sport_name = mysqli_real_escape_string($conn, $_POST["original_sport_name"]);
         $sql = "UPDATE sports SET sport='$sport_name', description='$sport_desc', file_name='$targetFile' WHERE sport='$original_sport_name'";
     }
 
     if (mysqli_query($conn, $sql)) {
-        header("Location: sports.php");
+        if ($current_mode == 'add') {
+            header("Location: edit_sports.php?sport=" . urlencode($sport_name));
+        } else {
+            header("Location: sports.php");
+        }
         exit;
     } else {
-        echo "Error: " . $sql . "<br>" . mysqli_error($conn);
-    }
-}
-
-if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_arena'])) {
-    $sport_id_query = "SELECT id FROM sports WHERE sport='" . $_POST['sport_name'] . "'";
-    $sport_id_result = mysqli_query($conn, $sport_id_query);
-    $sport_id_row = mysqli_fetch_assoc($sport_id_result);
-    $sport_id = $sport_id_row['id'];
-    $arena_name = mysqli_real_escape_string($conn, $_POST['new_arena_name']);
-    $location = mysqli_real_escape_string($conn, $_POST['new_arena_loc']);
-    $open_time = $_POST['new_open'];
-    $close_time = $_POST['new_close'];
-    $price = $_POST['new_price'];
-
-    $sql = "INSERT INTO arenas (sport_id, arena_name, location, open_time, close_time, hourly_price) VALUES ('$sport_id', '$arena_name', '$location', '$open_time', '$close_time', '$price')";
-
-    if (mysqli_query($conn, $sql)) {
-        // Arena added successfully, you might want to redirect or show a success message
-    } else {
+        // This will now only throw a duplicate error if you try to rename a sport to another existing sport's name.
         echo "Error: " . $sql . "<br>" . mysqli_error($conn);
     }
 }
@@ -96,12 +128,15 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_arena'])) {
                     </svg></button>
             </h2>
             <form id="sports" action="edit_sports.php" method="post" enctype="multipart/form-data">
-                <input type="hidden" name="original_sport_name" value="<?php echo $sport; ?>">
-                <input class="input" type="text" value="<?php echo $sport; ?>" id="sports_name" name="sport_name" required>
+                <input type="hidden" name="mode" value="<?php echo $mode; ?>">
+                <input type="hidden" name="original_sport_name" value="<?php echo htmlspecialchars($sport); ?>">
+                <input type="hidden" name="original_image" value="<?php echo htmlspecialchars($image); ?>">
+
+                <input class="input" type="text" value="<?php echo htmlspecialchars($sport); ?>" id="sports_name" name="sport_name" required>
                 <br>
                 <div class="col2">
                     <label class="card_preview_container" for="sports_card_image">
-                        <div class="card_preview" id="cardpreview" <?php if (!empty($image)) : ?> style="background-image: url('<?php echo $image ?>');" <?php endif; ?>>
+                        <div class="card_preview" id="cardpreview" <?php if (!empty($image)) : ?> style="background-image: url('<?php echo $image; ?>');" <?php endif; ?>>
                             <?php if (empty($image)) : ?>
                                 <svg xmlns="http://www.w3.org/2000/svg" height="48" viewBox="0 -960 960 960" width="48" fill="#e3e3e3">
                                     <path d="M440-280h80v-160h160v-80H520v-160h-80v160H280v80h160v160Zm40 200q-83 0-156-31.5T197-197q-54-54-85.5-127T80-480q0-83 31.5-156T197-763q54-54 127-85.5T480-880q83 0 156 31.5T763-763q54 54 85.5 127T880-480q0 83-31.5 156T763-197q-54 54-127 85.5T480-80Zm0-80q134 0 227-93t93-227q0-134-93-227t-227-93q-134 0-227 93t-93 227q0 134 93 227t227 93Zm0-320Z" />
@@ -109,21 +144,58 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_arena'])) {
                             <?php endif; ?>
                         </div>
                     </label>
-                    <input onchange="previewImage(this,getElementById('cardpreview'));" class="input" type="file" id="sports_card_image" name="sports_card_image" accept="image/*">
+                    <input onchange="previewImage(this, document.getElementById('cardpreview'));" class="input" type="file" id="sports_card_image" name="sports_card_image" accept="image/*">
                     <br>
-                    <textarea maxlength="170" class="input" name="sport_desc" rows="3" placeholder="<?php echo $description ?>"><?php echo $description; ?></textarea>
+                    <textarea maxlength="170" class="input" name="sport_desc" rows="3" placeholder="Short description..."><?php echo $description; ?></textarea>
                 </div>
                 <br>
             </form>
+            
             <?php if ($mode == 'edit') : ?>
                 <div class="sub_card">
-                    <h3>Add New Arena<button form="arena" type="submit" name="add_arena" class="add_btn"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                    <h3>Arenas</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Arena Name</th>
+                                <th>Location</th>
+                                <th>Price (LKR/hr)</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (empty($arenas)) : ?>
+                                <tr>
+                                    <td colspan="4">No arenas found for this sport.</td>
+                                </tr>
+                            <?php else : ?>
+                                <?php foreach ($arenas as $arena) : ?>
+                                    <tr>
+                                        <td><?php echo htmlspecialchars($arena['arena_name']); ?></td>
+                                        <td><?php echo htmlspecialchars($arena['location']); ?></td>
+                                        <td><?php echo htmlspecialchars($arena['hourly_price']); ?></td>
+                                        <td>
+                                            <a href="edit_arena.php?id=<?php echo $arena['id']; ?>">Edit</a> | 
+                                            <a href="delete_arena.php?id=<?php echo $arena['id']; ?>" onclick="return confirm('Are you sure you want to delete this arena?');">Delete</a>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="sub_card">
+                    <h3>Add New Arena
+                        <button form="arena" type="submit" name="add_arena" class="add_btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                                 <path d="M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z" />
-                            </svg></button>
+                            </svg>
+                        </button>
                     </h3>
                     <br>
-                    <form id="arena" class="form" action="edit_sports.php" method="post" enctype="multipart/form-data">
-                        <input type="hidden" name="sport_name" value="<?php echo $sport; ?>">
+                    <form id="arena" class="form" action="edit_sports.php" method="post">
+                        <input type="hidden" name="sport_name" value="<?php echo htmlspecialchars($sport); ?>">
                         <input type="text" name="new_arena_name" placeholder="Arena Name" required>
                         <br>
                         <input type="text" name="new_arena_loc" placeholder="Building / Area" required>
@@ -136,7 +208,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['add_arena'])) {
                         <br>
                         <label>Hourly Price</label>
                         <br><br>
-                        <input type="number" name="new_price" min="0" step="500" required>
+                        <input type="number" name="new_price" min="0" step="100" placeholder="e.g. 1500" required>
                     </form>
                 </div>
             <?php endif; ?>

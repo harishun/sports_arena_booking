@@ -4,6 +4,6 @@ $username = "root";
 $password = "";
 
 // Create connection
-$conn = new mysqli($servername, $username, $password, "arena_booking");
+$conn = mysqli_connect($servername, $username, $password, "arena_booking");
 
 ?>

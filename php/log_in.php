@@ -45,7 +45,7 @@ $password = htmlspecialchars($_POST['password']);
 if (empty($username) || empty($password)) {
     exit;
 }
-// Prepare and execute the SQL statement
+//SQL statement
 $username = mysqli_real_escape_string($conn, $username);
 $sql = "SELECT * FROM users WHERE username = '$username'";
 $result = mysqli_query($conn, $sql);  

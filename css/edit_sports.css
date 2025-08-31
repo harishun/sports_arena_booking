@@ -94,6 +94,7 @@ button{
     width: 100%;
     max-width: 420px;
     height: auto;
+    object-fit: cover;
     border-radius: 18px;
     box-shadow: 0 0 10px 1px var(--primary-accent-color);
 }
@@ -266,4 +267,9 @@ label{
 
 .container{
     padding-bottom:30px;
+}
+
+.card_img{
+    height:auto;
+    width:400px;
 }

@@ -1,12 +1,34 @@
 <?php
+// Prevent browser caching
+header("Cache-Control: no-cache, no-store, must-revalidate"); // HTTP 1.1.
+header("Pragma: no-cache"); // HTTP 1.0.
+header("Expires: 0"); // Proxies.
+
 include("connect_db.php");
+session_start();
 
 // Check if the user is logged in and has admin role
-session_start();
-if ($_SESSION['role'] != 'admin') {
-    header("Location: index.php");
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'admin') {
+    header("Location: ../index.php");
     exit;
-}  
+}
+
+// Auto-update ALL booking statuses to 'completed'
+$update_status_sql = "UPDATE bookings SET status = 'completed' WHERE CONCAT(booking_date, ' ', end_time) < NOW() AND status = 'confirmed'";
+mysqli_query($conn, $update_status_sql);
+
+// Fetch all bookings with user/guest details
+$sql_all_bookings = "SELECT 
+                        b.booking_date, 
+                        b.start_time, 
+                        b.end_time, 
+                        b.status,
+                        COALESCE(CONCAT(u.f_name, ' ', u.l_name), b.guest_name) AS full_name,
+                        COALESCE(u.tele, b.guest_phone) AS telephone
+                     FROM bookings b
+                     LEFT JOIN users u ON b.user_id = u.id
+                     ORDER BY b.booking_date DESC, b.start_time ASC";
+$result_all_bookings = mysqli_query($conn, $sql_all_bookings);
 ?>
 
 <!DOCTYPE html>
@@ -30,22 +52,36 @@ if ($_SESSION['role'] != 'admin') {
         <div class="table">
             <table>
                 <thead>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Sport</th>
-                    <th>Arena</th>
-                    <th>Full Name</th>
-                    <th>Phone Number</th>
+                    <tr>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Full Name</th>
+                        <th>Telephone</th>
+                        <th>Status</th>
+                    </tr>
                 </thead>
                 <tbody>
-                    <td>12:00</td>
-                    <td>13:00</td>
-                    <td>Badminton</td>
-                    <td>UOC Court 1</td>
-                    <td>Harishun Dhanaraj</td>
-                    <td>+94 771519681</td>
+                    <?php if (mysqli_num_rows($result_all_bookings) > 0): ?>
+                        <?php while ($row = mysqli_fetch_assoc($result_all_bookings)): ?>
+                            <tr>
+                                <td><?php echo htmlspecialchars($row['booking_date']); ?></td>
+                                <td><?php echo htmlspecialchars(date("g:i a", strtotime($row['start_time']))); ?></td>
+                                <td><?php echo htmlspecialchars(date("g:i a", strtotime($row['end_time']))); ?></td>
+                                <td><?php echo htmlspecialchars($row['full_name']); ?></td>
+                                <td><?php echo htmlspecialchars($row['telephone']); ?></td>
+                                <td><?php echo htmlspecialchars(ucfirst($row['status'])); ?></td>
+                            </tr>
+                        <?php endwhile; ?>
+                    <?php else: ?>
+                        <tr>
+                            <td colspan="6">No bookings found.</td>
+                        </tr>
+                    <?php endif; ?>
                 </tbody>
             </table>
         </div>
     </div>
 </body>
+
+</html>
