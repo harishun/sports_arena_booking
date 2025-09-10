@@ -45,7 +45,7 @@ body {
     text-align: center;
     margin-left:auto;
     margin-right:auto;
-    margin-top:10px;
+    margin-top:100px;
 }
 .card h2{
     color: var(--primary-accent-color);
@@ -219,11 +219,11 @@ label{
 .sub_card{
     background-color: var(--element-hover-background);
     backdrop-filter: blur(10px);
-    box-shadow: 0 0 10px 1px var(--secondary-accent-color);
     width:90%;
     border-radius:15px;
     margin-inline:auto;
     padding-bottom: 30px;
+    margin-block:20px;
 }
 .sub_card h3{
     font-size:2rem;
@@ -272,4 +272,41 @@ label{
 .card_img{
     height:auto;
     width:400px;
+}
+
+button{
+    background: transparent;
+    border:none;
+}
+
+/*table*/
+table {
+    width: 95%;
+    margin: auto;
+    border-collapse: separate;
+    border-spacing: 0;
+    overflow: hidden;
+    border-radius: 14px;
+    background: var(--element-hover-background);
+    backdrop-filter: blur(10px);
+    box-shadow: 0 0 5px 1px var(--primary-accent-color);
+    margin-top:30px;
+}
+
+table th,
+table td {
+    padding: 12px 10px;
+    border-bottom: 1px solid var(--secondary-accent-color);
+    backdrop-filter: blur(10px);
+    text-align: center;
+}
+
+table thead th {
+    background:var(--element-idle-background);
+    backdrop-filter: blur(10px);
+    color: var(--ink-dim);
+}
+
+.table{
+    padding-bottom:20px;
 }

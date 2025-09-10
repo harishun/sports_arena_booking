@@ -87,9 +87,12 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
 </head>
 
 <body>
+    <a href="../index.php" class="button back"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+            <path d="M280-200v-80h284q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l104 104-56 56-200-200 200-200 56 56-104 104h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H280Z" />
+        </svg></a>
     <!-- Edit Profile Overlay -->
     <div class="overlay hidden">
-        <h2>Edit Profile<svg onclick="toggle_overlay(document.querySelector('.overlay'))" id="close" class="close" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+        <h2>Edit Profile<svg onclick="toggle_overlay(document.querySelector('.overlay'),document.querySelector('.back'))" id="close" class="close" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
                 <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
             </svg></h2>
         <form method="POST" action="profile.php">
@@ -156,7 +159,7 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
         </div>
     </div>
     <?php if ($_SESSION["role"] == "user"): ?>
-        <div class="bookings">
+        <div class="card">
             <h2>My Bookings</h2>
             <br>
             <table>

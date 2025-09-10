@@ -20,10 +20,10 @@ if (isset($_REQUEST["sport"]) || (isset($_POST['mode']) && $_POST['mode'] == 'ed
     $mode = "edit";
     // Use the sport name from the request or the form's original_sport_name
     $sport_name = mysqli_real_escape_string($conn, $_REQUEST["sport"] ?? $_POST["original_sport_name"]);
-    
+
     $sql = "SELECT * FROM `sports` WHERE sport='" . $sport_name . "'";
     $result = mysqli_query($conn, $sql);
-    
+
     if ($row = mysqli_fetch_assoc($result)) {
         $sport_id = $row['id'];
         $sport = $row["sport"];
@@ -150,18 +150,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_sport'])) {
                 </div>
                 <br>
             </form>
-            
+
             <?php if ($mode == 'edit') : ?>
                 <div class="sub_card">
                     <h3>Arenas</h3>
                     <table>
                         <thead>
-                            <tr>
-                                <th>Arena Name</th>
-                                <th>Location</th>
-                                <th>Price (LKR/hr)</th>
-                                <th>Actions</th>
-                            </tr>
+                            <th>Arena Name</th>
+                            <th>Location</th>
+                            <th>Price (LKR/hr)</th>
+                            <th>Actions</th>
                         </thead>
                         <tbody>
                             <?php if (empty($arenas)) : ?>
@@ -175,7 +173,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_sport'])) {
                                         <td><?php echo htmlspecialchars($arena['location']); ?></td>
                                         <td><?php echo htmlspecialchars($arena['hourly_price']); ?></td>
                                         <td>
-                                            <a href="edit_arena.php?id=<?php echo $arena['id']; ?>">Edit</a> | 
+                                            <a href="edit_arena.php?id=<?php echo $arena['id']; ?>">Edit</a> |
                                             <a href="delete_arena.php?id=<?php echo $arena['id']; ?>" onclick="return confirm('Are you sure you want to delete this arena?');">Delete</a>
                                         </td>
                                     </tr>

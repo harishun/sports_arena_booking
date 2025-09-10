@@ -38,6 +38,7 @@ body {
     z-index:2000;
     transform: scale(1);
     transition: all 0.3s ease;
+    cursor: pointer;
 }
 .back svg:hover {
     position: fixed;
@@ -50,12 +51,17 @@ body {
     transform: scale(1.1);
 }
 
+.btn{
+    cursor:pointer;
+}
+
 .btn svg{
     fill:white;
     height:30px;
     width:30px; 
     transform: scale(1);
     transition: all 0.3s ease;
+    cursor:pointer;
 }
 
 .btn:hover svg{

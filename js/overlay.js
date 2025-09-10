@@ -1,7 +1,9 @@
 function toggle_overlay(overlay){
+   // Toggle the visibility of the overlay itself
    overlay.classList.toggle('hidden');
+   // Toggle the scrolling lock on the main page content
+   document.body.classList.toggle('overlay-active');
 }
-
 
 function previewImage(input,previewContainer) {
   const file = input.files[0];
