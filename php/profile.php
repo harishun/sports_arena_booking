@@ -21,7 +21,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     $new_username = mysqli_real_escape_string($conn, trim($_POST['username']));
     $email = mysqli_real_escape_string($conn, trim($_POST['e_mail']));
     $tele = mysqli_real_escape_string($conn, trim($_POST['tele']));
-    
+
     $can_update = true;
 
     // Check for duplicate username or email, but ignore the user's own current record
@@ -41,13 +41,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['update_profile'])) {
     if ($can_update) {
         // Start building the SQL query
         $sql_update = "UPDATE users SET f_name='$f_name', l_name='$l_name', username='$new_username', e_mail='$email', tele='$tele'";
-        
+
         // Only update the password if a new one is entered
         if (!empty($_POST['new_password'])) {
             $new_password_hashed = password_hash($_POST['new_password'], PASSWORD_DEFAULT);
             $sql_update .= ", password_hashed='$new_password_hashed'";
         }
-        
+
         $sql_update .= " WHERE username='$original_username'";
 
         if (mysqli_query($conn, $sql_update)) {
@@ -90,8 +90,8 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
     <!-- Edit Profile Overlay -->
     <div class="overlay hidden">
         <h2>Edit Profile<svg onclick="toggle_overlay(document.querySelector('.overlay'))" id="close" class="close" xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
-                    <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
-                </svg></h2>
+                <path d="m256-200-56-56 224-224-224-224 56-56 224 224 224-224 56 56-224 224 224 224-56 56-224-224-224 224Z" />
+            </svg></h2>
         <form method="POST" action="profile.php">
             <div class="name cardlet">
                 <label>First Name:</label>
@@ -108,7 +108,9 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
                 <div class="p_word_toggle">
                     <label>New Password:</label>
                     <input type="password" placeholder="Leave blank to keep current" id="password" name="new_password">
-                    <span onclick="toggle()" id="hide_show"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg></span>
+                    <span onclick="toggle()" id="hide_show"><svg xmlns="http://www.w3.org/2000/svg" height="24" viewBox="0 -960 960 960" width="24">
+                            <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
+                        </svg></span>
                 </div>
                 <br>
             </div>
@@ -124,7 +126,9 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
             </div>
             <div class="center">
                 <button type="submit" name="update_profile">
-                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z" /></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+                        <path d="M840-680v480q0 33-23.5 56.5T760-120H200q-33 0-56.5-23.5T120-200v-560q0-33 23.5-56.5T200-840h480l160 160Zm-80 34L646-760H200v560h560v-446ZM480-240q50 0 85-35t35-85q0-50-35-85t-85-35q-50 0-85 35t-35 85q0 50 35 85t85 35ZM240-560h360v-160H240v160Zm-40-86v446-560 114Z" />
+                    </svg>
                     <span>Save Changes</span>
                 </button>
             </div>
@@ -144,28 +148,34 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
             <p><strong>Email:</strong> <?php echo htmlspecialchars($profile['e_mail']); ?></p>
             <p><strong>Phone Number:</strong> <?php echo htmlspecialchars($profile['tele']); ?></p>
             <p><strong>Role:</strong> <?php echo strtoupper(htmlspecialchars($profile["role"])); ?></p>
+            <form method="POST" action="logout.php">
+                <button type="submit" name="logout" class="logout-btn">Logout</button>
+            </form>
+            <form method="POST" action="delete_profile.php" onsubmit="return confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.');">
+                <button type="submit" name="delete" class="delete-btn">Delete Account</button>
+            </form>
         </div>
     </div>
-    <?php if($_SESSION["role"]=="user"):?>
-    <div class="bookings">
-        <h2>My Bookings</h2>
-        <br>
-        <table>
-            <thead>
-                <tr>
-                    <th>Date</th>
-                    <th>Start Time</th>
-                    <th>End Time</th>
-                    <th>Sport</th>
-                    <th>Arena</th>
-                    <th>Status</th>
-                </tr>
-            </thead>
-            <tbody>
-                <?php
-                if (mysqli_num_rows($result_bookings) > 0) {
-                    while ($row = mysqli_fetch_assoc($result_bookings)) {
-                        echo "<tr>
+    <?php if ($_SESSION["role"] == "user"): ?>
+        <div class="bookings">
+            <h2>My Bookings</h2>
+            <br>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date</th>
+                        <th>Start Time</th>
+                        <th>End Time</th>
+                        <th>Sport</th>
+                        <th>Arena</th>
+                        <th>Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php
+                    if (mysqli_num_rows($result_bookings) > 0) {
+                        while ($row = mysqli_fetch_assoc($result_bookings)) {
+                            echo "<tr>
                                 <td>" . htmlspecialchars($row['booking_date']) . "</td>
                                 <td>" . htmlspecialchars(date("g:i a", strtotime($row['start_time']))) . "</td>
                                 <td>" . htmlspecialchars(date("g:i a", strtotime($row['end_time']))) . "</td>
@@ -173,21 +183,15 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
                                 <td>" . htmlspecialchars($row['arena_name']) . "</td>
                                 <td>" . htmlspecialchars(ucfirst($row['status'])) . "</td>
                               </tr>";
+                        }
+                    } else {
+                        echo "<tr><td colspan='6'>You have no bookings.</td></tr>";
                     }
-                } else {
-                    echo "<tr><td colspan='6'>You have no bookings.</td></tr>";
-                }
-                ?>
-            </tbody>
-        </table>
-    </div>
+                    ?>
+                </tbody>
+            </table>
+        </div>
     <?php endif; ?>
-
-    <form method="POST" action="logout.php">
-        <button type="submit" name="logout" class="logout-btn">Logout</button>
-    </form>
-    <form method="POST" action="delete_profile.php" onsubmit="return confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.');">
-        <button type="submit" name="delete" class="delete-btn">Delete Account</button>
-    </form>
 </body>
+
 </html>
