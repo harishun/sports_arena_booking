@@ -26,7 +26,7 @@ if($_SESSION['role'] != 'admin') {
 
 
     <!-- DASHBOARD -->
-    <div id="dashboard" class="container">
+    <div class="container">
         <div onclick="window.location.href='sports.php'" class="card">
             <h2>Sports</h2>
             <img class="card_img" src="../../images/sport_cards/badminton.jpg" alt="Badminton Image">
