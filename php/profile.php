@@ -2,6 +2,9 @@
 session_start();
 include_once 'connect_db.php';
 
+// Set the timezone to ensure NOW() in SQL uses the correct time for Sri Lanka
+date_default_timezone_set('Asia/Colombo');
+
 // Redirect if not logged in
 if (!isset($_SESSION['username'])) {
     header("Location: ../index.php");
@@ -66,13 +69,28 @@ $sql_fetch_user = "SELECT * FROM users WHERE username='$username'";
 $result_user = mysqli_query($conn, $sql_fetch_user);
 $profile = mysqli_fetch_assoc($result_user);
 $_SESSION['user_id'] = $profile['id'];
+$user_id = $profile['id'];
 
-// Fetch user's bookings
+// --- CORE LOGIC: AUTO-UPDATE BOOKING STATUSES ---
+// This query updates the status of any 'confirmed' bookings to 'completed'
+// if their end time is in the past, according to the server's current time.
+$sql_update_status = "
+    UPDATE bookings 
+    SET status = 'completed' 
+    WHERE user_id = '$user_id' 
+      AND CONCAT(booking_date, ' ', end_time) < NOW() 
+      AND status = 'confirmed'
+";
+mysqli_query($conn, $sql_update_status);
+// --- END OF CORE LOGIC ---
+
+
+// Fetch user's bookings *after* statuses have been updated
 $sql_bookings = "SELECT b.booking_date, b.start_time, b.end_time, s.sport, a.arena_name, b.status 
                  FROM bookings b
                  JOIN arenas a ON b.arena_id = a.id
                  JOIN sports s ON a.sport_id = s.id
-                 WHERE b.user_id = " . $profile['id'] . " ORDER BY b.booking_date DESC, b.start_time ASC";
+                 WHERE b.user_id = '$user_id' ORDER BY b.booking_date DESC, b.start_time ASC";
 $result_bookings = mysqli_query($conn, $sql_bookings);
 ?>
 <!DOCTYPE html>
@@ -87,7 +105,7 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
 </head>
 
 <body>
-    <a href="../index.php" class="button back"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
+    <a <?php if($_SESSION["role"]=="admin"){echo 'href="admin_home.php"';}else{echo 'href="../index.php"';} ?>  class="button back"><svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3">
             <path d="M280-200v-80h284q63 0 109.5-40T720-420q0-60-46.5-100T564-560H312l104 104-56 56-200-200 200-200 56 56-104 104h252q97 0 166.5 63T800-420q0 94-69.5 157T564-200H280Z" />
         </svg></a>
     <!-- Edit Profile Overlay -->
@@ -153,15 +171,16 @@ $result_bookings = mysqli_query($conn, $sql_bookings);
             <form method="POST" action="logout.php">
                 <button type="submit" name="logout" class="logout-btn">Logout</button>
             </form>
+            <?php if($_SESSION["role"]!="admin"):?>
             <form method="POST" action="delete_profile.php" onsubmit="return confirm('Are you absolutely sure you want to delete your account? This action cannot be undone.');">
                 <button type="submit" name="delete" class="delete-btn">Delete Account</button>
             </form>
+            <?php endif; ?>
         </div>
     </div>
     <?php if ($_SESSION["role"] == "user"): ?>
         <div class="card">
             <h2>My Bookings</h2>
-            <br>
             <table>
                 <thead>
                     <tr>
