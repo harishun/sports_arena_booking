@@ -14,6 +14,7 @@ $is_logged_in = isset($_SESSION['username']);
 $user_details = null;
 $sport_found = false;
 $error_message = '';
+$tele_error = '';
 
 if ($is_logged_in) {
     $username = $_SESSION['username'];
@@ -32,6 +33,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST["sport"])) {
 } else {
     $sport_name = null;
     $error_message = "No sport was selected. Please choose a sport from the homepage to begin booking.";
+}
+
+// Validate guest phone number
+// Strip any character that is not a digit or the plus '+' sign
+$tele_cleaned = preg_replace('/[^\d\+]/', '', $guest_phone);
+
+// Check if the cleaned number follows the international format (e.g., +94771234567)
+if (!preg_match('/^\+\d{7,15}$/', $tele_cleaned)) {
+    echo "<script>alert('Error: Please enter a valid international phone number for the guest (e.g., +94771234567).'); window.location.href='book.php?sport=" . urlencode($sport_name) . "';</script>";
+    exit;
 }
 
 // Only proceed if a sport name exists
@@ -153,6 +164,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['book'])) {
                     <label>Full Name: <input type="text" name="guest_name" required></label>
                     <label>Email: <input type="email" name="guest_email" required></label>
                     <label>Phone Number: <input type="tel" name="guest_phone" required></label>
+                    <p><?php echo $tele_error;?></p>
                 <?php endif; ?>
 
                 <label>Select Arena:

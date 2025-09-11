@@ -29,15 +29,15 @@ if($_SESSION['role'] != 'admin') {
     <div class="container">
         <div onclick="window.location.href='sports.php'" class="card">
             <h2>Sports</h2>
-            <img class="card_img" src="../../images/sport_cards/badminton.jpg" alt="Badminton Image">
+            <img class="card_img" src="../../images/admin_cards/sport.jpg" ria-hidden="true">
         </div>
         <div onclick="window.location.href='users.php'" class="card">
             <h2>Users</h2>
-            <img class="card_img" src="../../images/sport_cards/badminton.jpg" alt="Badminton Image">
+            <img class="card_img" src="../../images/admin_cards/users.jpg" aria-hidden="true">
         </div>
         <div onclick="window.location.href='bookings.php'" class="card">
             <h2>Bookings</h2>
-            <img class="card_img" src="../../images/sport_cards/badminton.jpg" alt="Badminton Image">
+            <img class="card_img" src="../../images/admin_cards/bookings.jpg" aria-hidden="true">
         </div>
     </div>
 </body>

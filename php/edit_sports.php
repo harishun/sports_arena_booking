@@ -85,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['save_sport'])) {
             mkdir($uploadDir, 0755, true);
         }
         $ext = strtolower(pathinfo($_FILES["sports_card_image"]["name"], PATHINFO_EXTENSION));
-        $newName = bin2hex(random_bytes(8)) . "." . $ext;
+        $newName = $_POST['sport_name'] . "." . $ext;
         $targetFile = $uploadDir . $newName;
         move_uploaded_file($_FILES["sports_card_image"]["tmp_name"], $targetFile);
     }

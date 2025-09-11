@@ -19,19 +19,21 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $tele = $_POST['tele'] ?? '';
     $username = $_POST['username'] ?? '';
     $password = $_POST['password'] ?? '';
-    
+
     $can_register = true;
 
     // 1. Validate International Telephone Number
-    $tele_cleaned = preg_replace('/[\s\-()]/', '', $tele); 
+    // Strip any character that is not a digit or the plus '+' sign
+    $tele_cleaned = preg_replace('/[^\d\+]/', '', $guest_phone);
+
+    // Check if the cleaned number follows the international format (e.g., +94771234567)
     if (!preg_match('/^\+\d{7,15}$/', $tele_cleaned)) {
-        $tele_error = "Please enter a valid international phone number (e.g., +94771234567).";
-        $can_register = false;
+        $tele_error = "Please enter a valid international phone number.";
     }
 
     $username_sanitized = mysqli_real_escape_string($conn, $username);
     $email_sanitized = mysqli_real_escape_string($conn, $e_mail);
-    
+
     // 2. NEW: Check if both username AND email match a single existing user
     $exact_match_sql = "SELECT id FROM users WHERE username = '$username_sanitized' AND e_mail = '$email_sanitized' LIMIT 1";
     $exact_match_result = mysqli_query($conn, $exact_match_sql);
@@ -66,7 +68,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         $insert_sql = "INSERT INTO users (f_name, l_name, e_mail, tele, username, password_hashed) 
                        VALUES ('$f_name_db', '$l_name_db', '$email_sanitized', '$tele_db', '$username_sanitized', '$password_hashed')";
-        
+
         if (mysqli_query($conn, $insert_sql)) {
             header("Location: log_in.php?registration=success");
             exit;
@@ -78,6 +80,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -85,8 +88,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     <link rel="stylesheet" href="../css/credential.css">
     <script src="../js/credential.js"></script>
 </head>
+
 <body>
-    
+
     <div class="wrapper">
         <a href="../index.php"><img style="margin-top:10px; width:100px; height:100px;" src="../images/icons/logo.png" alt="logo"></a>
         <h1>Register</h1>
@@ -113,7 +117,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <br>
             <div class="p_word_toggle">
                 <input type="password" placeholder="Password" id="password" name="password" required>
-                <span onclick="toggle()" id="hide_show"><svg xmlns="http://www.w.org/2000/svg" height="24" viewBox="0 -960 960 960"><path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z"/></svg></span>
+                <span onclick="toggle()" id="hide_show"><svg xmlns="http://www.w.org/2000/svg" height="24" viewBox="0 -960 960 960">
+                        <path d="M480-320q75 0 127.5-52.5T660-500q0-75-52.5-127.5T480-680q-75 0-127.5 52.5T300-500q0 75 52.5 127.5T480-320Zm0-72q-45 0-76.5-31.5T372-500q0-45 31.5-76.5T480-608q45 0 76.5 31.5T588-500q0 45-31.5 76.5T480-392Zm0 192q-146 0-266-81.5T40-500q54-137 174-218.5T480-800q146 0 266 81.5T920-500q-54 137-174 218.5T480-200Zm0-300Zm0 220q113 0 207.5-59.5T832-500q-50-101-144.5-160.5T480-720q-113 0-207.5 59.5T128-500q50 101 144.5 160.5T480-280Z" />
+                    </svg></span>
             </div>
             <br>
             <button type="submit">Register</button>
@@ -123,4 +129,5 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <br>
     </div>
 </body>
+
 </html>
